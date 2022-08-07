@@ -57,6 +57,7 @@ header {
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
+  min-height: 1px;
 }
 
 .photo-card {
@@ -101,21 +102,6 @@ line-height: .7;
   }
 }
 
-.load-more {
-  background-color: rgb(2, 83, 159);
-  border-radius: 7px;
-  p {
-    font-family: 'Roboto'; 
-    text-align: center;
-    font-size: 22px;
-    color: rgb(255, 255, 255);
-    margin: 9px 15px;
-  }
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 40px;
-}
-
 .search-form {
   display: flex;
   justify-content: center;
@@ -132,4 +118,8 @@ line-height: .7;
 
 .photo-frame {
   height: 190px;
+}
+
+.hidden_card {
+  visibility: hidden;
 }

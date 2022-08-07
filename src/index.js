@@ -1,31 +1,44 @@
-import FetchPhotos from "./fetchPhotos.js";
+import PhotoService from "./fetchPhotos.js";
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
+import InfiniteAjaxScroll from '@webcreate/infinite-ajax-scroll';
+
 
 const searchQueryForm = document.querySelector("#search-form");
 const searchInput = document.querySelector("#search-form > input");
 const galleryPart = document.querySelector(".gallery");
-const loadMoreButton = document.querySelector(".load-more");
-loadMoreButton.style.display = "none";
 
-const fetchMaker = new FetchPhotos();
+const fetchMaker = new PhotoService();
+
+const infiniteScroll = new InfiniteAjaxScroll(".gallery", {
+  item: '.photo-card',
+  next: fetchArticles,
+  pagination: false,
+});
 
 searchQueryForm.addEventListener("submit", onSubmit);
-loadMoreButton.addEventListener("click", fetchArticles);
 
 function onSubmit(event) {
   event.preventDefault();
   galleryPart.innerHTML = "";
-  loadMoreButton.style.display = "none";
   fetchMaker.resetPage();
   fetchMaker.request = searchInput.value;
-  fetchArticles();
-  event.currentTarget.reset();
+  infiniteScroll.next();
 }
 
 function fetchArticles() {
-  fetchMaker.newFetch().then(res => cardBuilder(res.data));
+  if (searchInput.value === "") {
+    return Promise.resolve(false);
+  }
+  return fetchMaker.getPhotos().then(res => {
+    cardBuilder(res.data);
+    const totalHits = res.data.totalHits;
+    const currentPage = fetchMaker.pageNumber - 1;
+    const cardsNumber = fetchMaker.cardsNumber;
+    const maxPageNumber = totalHits / cardsNumber;
+    return !(currentPage >= maxPageNumber && totalHits > cardsNumber)
+  });
 }
 
 function cardBuilder(photoSet) {
@@ -72,17 +85,12 @@ function photosCounter(initialData) {
   const cardsNumber = fetchMaker.cardsNumber;
   const maxPageNumber = totalHits / cardsNumber;
 
-  if (currentPage === 1 && maxPageNumber > 1) {
-    loadMoreButton.style.display = "block";
-  }
   if (currentPage === 1 && totalHits > 0) {
     Notify.success(`Hooray! We found ${totalHits} images.`)
   } else if (currentPage === 1 && totalHits === 0) {
-    loadMoreButton.style.display = "none";
     Notify.failure("Sorry, there are no images matching your search query. Please try again.")
   }
   if (currentPage >= maxPageNumber && totalHits > cardsNumber) {
-    loadMoreButton.style.display = "none";
     Notify.info("We're sorry, but you've reached the end of search results.")
   }
 }
