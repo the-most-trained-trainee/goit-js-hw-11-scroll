@@ -4,7 +4,6 @@ import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import InfiniteAjaxScroll from '@webcreate/infinite-ajax-scroll';
 
-
 const searchQueryForm = document.querySelector("#search-form");
 const searchInput = document.querySelector("#search-form > input");
 const galleryPart = document.querySelector(".gallery");
@@ -27,18 +26,37 @@ function onSubmit(event) {
   infiniteScroll.next();
 }
 
-function fetchArticles() {
+// this
+
+// function fetchArticles() {
+//   if (searchInput.value === "") {
+//     return Promise.resolve(false);
+//   }
+//   return fetchMaker.getPhotos().then(res => {
+//     cardBuilder(res.data);
+
+//     const totalHits = res.data.totalHits;
+//     const currentPage = fetchMaker.pageNumber - 1;
+//     const cardsNumber = fetchMaker.cardsNumber;
+//     const maxPageNumber = totalHits / cardsNumber;
+//     return !(currentPage >= maxPageNumber && totalHits > cardsNumber)
+//   });
+// }
+
+async function fetchArticles() {
   if (searchInput.value === "") {
-    return Promise.resolve(false);
+    return false;
   }
-  return fetchMaker.getPhotos().then(res => {
-    cardBuilder(res.data);
-    const totalHits = res.data.totalHits;
-    const currentPage = fetchMaker.pageNumber - 1;
-    const cardsNumber = fetchMaker.cardsNumber;
-    const maxPageNumber = totalHits / cardsNumber;
-    return !(currentPage >= maxPageNumber && totalHits > cardsNumber)
-  });
+
+  const response = await fetchMaker.getPhotos();
+  const totalHits = response.data.totalHits;
+  const currentPage = fetchMaker.pageNumber - 1;
+  const cardsNumber = fetchMaker.cardsNumber;
+  const maxPageNumber = totalHits / cardsNumber;
+
+  cardBuilder(response.data);
+
+  return !(currentPage >= maxPageNumber && totalHits > cardsNumber)
 }
 
 function cardBuilder(photoSet) {

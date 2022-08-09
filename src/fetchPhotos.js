@@ -2,19 +2,20 @@ import axios from "axios";
 
 export default class PhotoService {
 
+  static PIXABAY_KEY = "29078045-8c2db167d821a84d590b709ce";
+
   constructor() {
     this.searchRequest = "";
     this.pageNumber = 1;
     this.cardsNumber = 40;
   }
 
-  getPhotos = () => {
-    const PIXABAY_KEY = "29078045-8c2db167d821a84d590b709ce"
-    const result = axios.get(
+  getPhotos = async () => {
+    const response = await axios.get(
       `https://pixabay.com/api`,
       {
         params: {
-          key: PIXABAY_KEY,
+          key: PhotoService.PIXABAY_KEY,
           image_type: "photo",
           orientation: "horizontal",
           safesearch: true,
@@ -24,10 +25,9 @@ export default class PhotoService {
         }
       }
     );
-    return result.then((res) => {
-      this.pageNumber++;
-      return res;
-    });
+    this.pageNumber++;
+
+    return response;
   }
 
   resetPage() {
